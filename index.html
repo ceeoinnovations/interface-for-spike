@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title> Local PiServer </title>
+
+  <!-- SCRIPTS THAT MAKE THIS RUN -->
+  <script src="./src/ServiceDock.js"></script>
+  <script src="./src/IDE.js"></script>
+  <script defer src="./src/WebSPIKEscript.js"></script>
+  <script src="./src/move_n_control_functions.js"> </script>
+  <script src="./src/code_edit_functions.js"> </script>
+  <script src="./src/toggle_functions.js"> </script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial;
+    }
+
+    #editor {
+      border: 1px black solid;
+      position: absolute;
+      top: 47%;
+      left: 25%;
+      height: 45%;
+      width: 50%;
+    }
+
+    .tooltip:focus {
+      outline: 0;
+    }
+
+    /* toolTip CSS from w3schools */
+
+    /* Tooltip container */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    /* Tooltip text */
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 190%;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      padding: 5px 0;
+      border-radius: 6px;
+
+      /* Position the tooltip text */
+      position: absolute;
+      top: 30px;
+      z-index: 1;
+      left: 10%;
+
+      /* Fade in tooltip */
+      opacity: 0;
+      transition: opacity 0.3s;
+      transition-delay: 0.5s;
+    }
+
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Style buttons */
+    .btn {
+      background-color: White;
+      border: none;
+      /* Remove borders */
+      color: white;
+      /* White text */
+      font-size: 16px;
+      /* Set a font size */
+      cursor: pointer;
+      /* Mouse pointer on hover */
+      display: inline-block;
+    }
+
+    /* Darker background on mouse-over */
+    .btn1:hover {
+      background-color: lightgreen;
+    }
+
+    .btn1 {
+      border-radius: 100%;
+    }
+
+    /* Style the tab */
+    .tab {
+      overflow: hidden;
+      border: 1px solid #ccc;
+      background-color: #f1f1f1;
+    }
+
+    /* Style the buttons inside the tab */
+    .tab button {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      font-size: 17px;
+    }
+
+    /* Change background color of buttons on hover */
+    .tab button:hover {
+      background-color: #ccc;
+    }
+
+    /* Create an active/current tablink class */
+    .tab button.active {
+      background-color: #90E4C1;
+    }
+
+    /* Style the tab content */
+    .tabcontent {
+      display: none;
+      padding: 6px 12px;
+      border: 1px solid white;
+      border-top: none;
+    }
+
+    .container {
+      position: relative;
+      text-align: center;
+      color: black;
+    }
+
+    .centered {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .left-center {
+      position: absolute;
+      bottom: 50%;
+      left: 23%;
+    }
+
+    .right-center {
+      position: absolute;
+      bottom: 50%;
+      right: 23%;
+    }
+
+    .slidecontainer {
+      width: 100%;
+    }
+
+    .slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 15px;
+      border-radius: 5px;
+      background: #d3d3d3;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: .2s;
+      transition: opacity .2s;
+    }
+
+    .slider:hover {
+      opacity: 1;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #04AA6D;
+      cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #04AA6D;
+      cursor: pointer;
+    }
+
+    .dropdowntext {
+      font-size: 20px;
+    }
+
+    .arrowsize {
+      font-size: 90px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .column {
+      float: left;
+      width: 50%;
+      padding: 10px;
+      height: 400px;
+      /* Should be removed. Only for demonstration */
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- SERVICE SPIKE -->
+  <span style="float:left;">
+    <img src="./img/step_one.png" width="30" height="30">
+    &nbsp;&nbsp;
+    <service-spike id="service_SPIKE" class="service tooltip" style="top: -5px;" onclick="showEverything()">
+      <span class="tooltiptext"></span>
+    </service-spike>
+  </span>
+  <br>
+  <br>
+  <br>
+  <br>
+
+<div class="hidden" id="everything">
+  <!-- TABS -->
+  <div class="tab">
+    <button class="tablinks"><img src="./img/step_two.png" width="30" height="30" /></button>
+    <button class="tablinks" onclick="openTab(event, 'move')"><img src="img/move.png" height="50" width="55" /></button>
+    <button class="tablinks" onclick="openTab(event, 'control')"><img src="img/control.png" height="50"
+        width="70" /></button>
+    <button class="tablinks" onclick="openTab(event, 'code')"><img src="img/code.png" height="50"
+        width="70" /></button></button>
+  </div>
+
+  <!-- DIVS ----------------------------------------------------->
+  <br>
+  <img src="./img/number3_PNG14957.png" width="30" height="30" />
+
+  <!--- MOVEPRIME DIV!!!------------------------------------>
+  <div id="move" class="tabcontent">
+    <p style="text-align:center;">
+      <img src="./img/move_motor_port.png" width="110" height="90" />
+      <br>
+      <br>
+
+      <button class="btn btn1" onclick="move_go_straight()"><img src="img/up_arrow.png" height="80"
+          width="80" /></button> <br>
+      <button class="btn btn1" onclick="move_turn_left()"><img src="img/left_arrow.png" height="80"
+          width="80" /></button>
+      </button>
+      <button class="btn btn1" onclick="move_rotate_180()"><img src="img/rotate_180.png" height="100"
+          width="100" /></button>
+      <button class="btn btn1" onclick="move_turn_right()"><img src="img/right_arrow.png" height="80"
+          width="80" /></button>
+      <br>
+      <button class="btn btn1" onclick="move_go_backwards()"><img src="img/down_arrow.png" height="80"
+          width="80" /></button>
+    </p>
+  </div>
+
+  <!-- DROPDOWN PAGE DIV!!!------------------------------------>
+  <div id="control" class="tabcontent">
+    <div class="row">
+      <div class="column" style="background-color:white;">
+        <div class="container">
+          <img src="./img/SPIKEoutline.png" height="370" width="390" >
+
+          <div class="left-center">
+            <select name="motorport1" id="motorport1" class="dropdowntext">
+              <option value="A"> A </option>
+              <option value="B"> B </option>
+              <option value="C"> C </option>
+              <option value="D"> D </option>
+              <option value="E"> E </option>
+              <option value="F"> F </option>
+            </select>
+          </div>
+
+          <div class="right-center">
+            <select name="motorport2" id="motorport2" class="dropdowntext">
+              <option value="A"> A </option>
+              <option value="B" selected> B </option>
+              <option value="C"> C </option>
+              <option value="D"> D </option>
+              <option value="E"> E </option>
+              <option value="F"> F </option>
+            </select>
+          </div>
+
+          <div class="centered">
+            <select name="direction" id="direction" class="arrowsize">
+              <option value="forward"> &#x2191; </option>
+              <option value="backward"> &#x2193; </option>
+              <option value="right"> &#x2192; </option>
+              <option value="left"> &#x2190; </option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="column" style="background-color:white;">
+        <div class="container">
+          <img src="img/clock.png" height="140" width="140" />
+
+          <div class="centered">
+            <select name="seconds" id="seconds" class="dropdowntext" style="font-size: 35px;">
+              <option value="1"> 1 </option>
+              <option value="2"> 2 </option>
+              <option value="3"> 3 </option>
+              <option value="4"> 4 </option>
+              <option value="5"> 5 </option>
+              <option value="6"> 6 </option>
+              <option value="7"> 7 </option>
+              <option value="8"> 8 </option>
+              <option value="9"> 9 </option>
+              <option value="10"> 10 </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- CHEETAH AND TURTLE --> 
+        <p style="text-align:left">
+          <img src="img/tortuga.png" height="70" width="140" />
+          <span style="float:right;">
+            <img src="img/cheetah.png" height="100" width="150" />
+          </span>
+          <br>
+        </p>
+        
+        <!-- SPEED SLIDER -->
+        <div class="slidecontainer">
+          <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+          <p style="text-align:center;" class="dropdowntext"><span id="demo"></span></p>
+        </div>
+
+        <script>
+          var slider = document.getElementById("myRange");
+          var output = document.getElementById("demo");
+          output.innerHTML = slider.value;
+
+          slider.oninput = function () {
+            output.innerHTML = this.value;
+          }
+        </script>
+
+
+        <!-- SUBMIT BUTTON --> 
+        <p style="text-align:center">
+          <button type="button" class="btn" onclick="on_submit()"> <img src="./img/button_run.png" height="80"
+              width="80" /></button>
+          <button type="button" class="btn" onclick="store_code();getLocalStorage();openTab(event, 'code')"> <img
+              src="./img/see_python.png" height="80" width="184" /> </button>
+        </p>
+
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <!-- CODE PAGE DIV!!!------------------------------------>
+
+  <div id="code" class="tabcontent">
+    <p style="text-align:center">
+      <input class="button" type="button" id="save" value="Save" style="display: none">
+      <input type="button" id="execute" value="Execute" style="display: none">
+      <input type="button" id="saveandexecute" value="Save and Execute" style="display: none">
+      <label for="saveandexecute"> <img src="./img/button_save_run.png" height="50" width="115" />
+      </label>
+    </p>
+
+    <!--GUI-->
+    <div id="demobox">
+
+      <!-- ####         ***         Code editor          ***        #### -->
+      <!-- #### CHANGE THIS CODE TO CHANGE DEFAULT SPIKE PRIME CODE #### -->
+      <div id="editor"># Sample Code
+from spike import PrimeHub, LightMatrix, Motor, MotorPair
+from spike.control import wait_for_seconds, wait_until, Timer
+hub = PrimeHub()
+
+pair = MotorPair('A', 'B')
+pair.start_tank(25, 25)
+wait_for_seconds(1)
+pair.stop()
+      </div>
+    </div>
+    <br>
+    <br>
+  </div>
+
+  <script>
+    /* global objects */
+    var editor = ace.edit("editor");
+    // var mySPIKE = document.getElementById("service_SPIKE").getService();
+
+    var buttonSaveAndExecute = document.getElementById("saveandexecute");
+    buttonSaveAndExecute.addEventListener("click", function () {
+
+      // stop any currently running program
+      mySPIKE.stopCurrentProgram();
+
+      // get text content with Ace.js API
+      var editSession = editor.getSession();
+      var codeSession = editSession.getValue();
+      // strip "/r" from variable
+      codeSession = codeSession.replace(/\r/g, ""); // replace with nothing
+
+      // write program to brick
+      mySPIKE.writeProgram("MyCode", codeSession, 0, async function () {
+        // execute program
+        mySPIKE.executeProgram(0);
+      });
+    })
+
+    // save program sequence
+    var buttonSave = document.getElementById("save");
+    buttonSave.addEventListener("click", function () {
+
+      // get text content with Ace.js API
+      var editSession = editor.getSession();
+      var codeSession = editSession.getValue();
+      // strip "/r" from variable
+      codeSession = codeSession.replace(/\r/g, ""); // replace with nothing
+
+      // write program to brick
+      mySPIKE.writeProgram("MyCode", codeSession, 0, async function () {
+        // stop any currently running program
+        mySPIKE.stopCurrentProgram();
+      });
+    })
+
+    // execute program sequence
+    var buttonExecute = document.getElementById("execute");
+    buttonExecute.addEventListener("click", function () {
+      mySPIKE.stopCurrentProgram();
+      mySPIKE.executeProgram(0);
+    })
+
+    // var buttonStop = document.getElementById("stop");
+    // buttonStop.addEventListener("click", function () {
+    //   mySPIKE.stopCurrentProgram();
+    // })
+  </script>
+
+</div>
+</body>
+
+</html>
